@@ -225,6 +225,31 @@ class PostgresInsertIntoOnConflictTests(unittest.TestCase):
             str(query),
         )
 
+    def test_insert_on_conflict_do_update_multiple_fields_chaining(self):
+        query = (
+            PostgreSQLQuery.into(self.table_abc)
+            .insert(1, "m")
+        )
+        qs1 = (
+            query
+            .on_conflict(self.table_abc.id, self.table_abc.sub_id)
+            .do_update(self.table_abc.f_name, "fm")
+        )
+        qs2 = (
+            query
+            .on_conflict(self.table_abc.new_id, self.table_abc.new_sub_id)
+            .do_update(self.table_abc.s_name, "sm")
+        )
+
+        self.assertEqual(
+            """INSERT INTO "abc" VALUES (1,'m') ON CONFLICT ("id", "sub_id") DO UPDATE SET "f_name"='fm'""",
+            str(qs1),
+        )
+        self.assertEqual(
+            """INSERT INTO "abc" VALUES (1,'m') ON CONFLICT ("new_id", "new_sub_id") DO UPDATE SET "s_name"='sm'""",
+            str(qs2),
+        )
+
     def test_insert_on_conflict_do_update_field_str(self):
         query = PostgreSQLQuery.into(self.table_abc).insert(1, "m").on_conflict("id").do_update("name", "m")
 

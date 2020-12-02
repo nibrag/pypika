@@ -308,6 +308,7 @@ class PostgreQueryBuilder(QueryBuilder):
         newone = super().__copy__()
         newone._returns = copy(self._returns)
         newone._on_conflict_do_updates = copy(self._on_conflict_do_updates)
+        newone._on_conflict_fields = copy(self._on_conflict_fields)
         return newone
 
     @builder
